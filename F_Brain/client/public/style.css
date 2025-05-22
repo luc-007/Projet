@@ -1,0 +1,122 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Crée une grille responsive */
+    gap: 20px; /* Espacement entre les articles */
+}
+
+.article-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.article-item h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #007bff; /* Couleur bleue pour le titre de l'article */
+}
+
+.article-images {
+    display: flex;
+    align-items: flex-start; /* Alignement en haut */
+    margin-bottom: 10px;
+}
+
+.main-image {
+    width: 60%; /* L'image principale prend plus de place */
+    height: auto;
+    object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.thumbnail-images {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Espacement entre les miniatures */
+}
+
+.thumbnail {
+    width: 80px; /* Taille des miniatures */
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    cursor: pointer; /* Indique que les miniatures sont cliquables */
+    border-radius: 4px;
+    transition: transform 0.2s ease-in-out; /* Animation au survol */
+}
+
+.thumbnail:hover {
+    transform: scale(1.05); /* Agrandit légèrement au survol */
+}
+
+.article-description {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 10px;
+    flex-grow: 1; /* Permet à la description de prendre l'espace restant */
+}
+
+.article-details {
+    display: flex;
+    justify-content: space-between; /* Aligne le stock à gauche et le prix à droite */
+    align-items: center;
+    margin-top: auto; /* Pousse les détails en bas de l'élément */
+}
+
+.stock-info {
+    font-size: 0.8em;
+    color: #008000; /* Couleur verte pour le stock */
+    margin: 0;
+}
+
+.price {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #e74c3c; /* Couleur rouge pour le prix */
+    margin: 0;
+}
+
+/* Styles pour les boutons (vous pouvez les adapter) */
+button {
+    background-color: #28a745; /* Vert pour commander */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Style spécifique pour le bouton éditer si vous le souhaitez */
+.article-item a button {
+    background-color: #ffc107; /* Jaune pour éditer */
+    color: #333;
+}
+
+.article-item a button:hover {
+    background-color: #e0a800;
+}
