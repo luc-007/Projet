@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  client:
+    build: ./client
+    ports:
+      - "80:80" # Mappe le port 80 du conteneur au port 80 de l'hôte
+    volumes:
+      # Optionnel: Monter le code source pour le développement local (pas pour le build final)
+      # Utile pour voir les changements frontend sans reconstruire l'image à chaque fois
+      - ./client:/app
+      - /app/node_modules # Exclure node_modules du montage (pour éviter les problèmes de compatibilité)
+    depends_on:
+      - server # Le frontend dépend du backend pour les appels API
+      - proxy # Le frontend est servi via le proxy
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    ports:
+      - "8000:8000" # Mappe le port 8000 du conteneur au port 8000 de l'hôte (pour le développement/débogage)
+    volumes:
+      - ./server:/app # Monter le code source pour le développement local
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Utilise des variables d'environnement pour les identifiants DB
+      - SECRET_KEY=votre_cle_secrete_django # Remplacez par une clé secrète forte
+      - DEBUG=True # Mettez à False pour la production
+      - DJANGO_ALLOWED_HOSTS=* # Permet tous les hôtes pour le développement
+    depends_on:
+      - db # Le backend dépend de la base de données
+    networks:
+      - app-network
+    # Commande pour appliquer les migrations au démarrage du conteneur (pour le développement)
+    # En production, vous exécuteriez cela manuellement ou via un script de déploiement
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+
+  db:
+    image: postgres:13-alpine # Utilise une image officielle de PostgreSQL
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/ # Stockage persistant pour les données de la base de données
+    environment:
+      - POSTGRES_DB=mydatabase # Nom de la base de données
+      - POSTGRES_USER=user       # Utilisateur de la base de données
+      - POSTGRES_PASSWORD=password # Mot de passe de la base de données
+    networks:
+      - app-network
+
+  proxy:
+    build: ./proxy
+    ports:
+      - "80:80" # Le proxy est accessible sur le port 80 de l'hôte
+    depends_on:
+      - client # Le proxy sert le frontend
+      - server # Le proxy achemine les requêtes vers le backend
+    networks:
+      - app-network
+
+  # monitoring:
+  #   build: ./monitoring
+  #   networks:
+  #     - app-network
+  #   # Ajoutez ici la configuration pour Prometheus/Grafana si vous les utilisez
+
+volumes:
+  postgres_data: # Définit le volume nommé pour le stockage persistant de la base de données
+
+networks:
+  app-network:
+    driver: bridge # Crée un réseau Docker pour que les services puissent communiquer entre eux par leur nom

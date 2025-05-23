@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  client:
+    build: ./client
+    ports:
+      # Mappe le port 80 du conteneur (Nginx) au port 5173 de l'hôte
+      - "5173:80"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+      - proxy
+    networks:
+      - app-network
+
+  server:
+    build: ./server
+    ports:
+      # Mappe le port 8000 du conteneur (Django) au port 8000 de l'hôte
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - SECRET_KEY=votre_cle_secrete_django
+      - DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=*
+    depends_on:
+      - db
+    networks:
+      - app-network
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
+    # Pas besoin d'exposer le port de la base de données vers l'hôte pour le fonctionnement normal
+
+  proxy:
+    build: ./proxy
+    ports:
+      # Mappe le port 80 du conteneur (Nginx) au port 4176 de l'hôte
+      - "4176:80"
+    depends_on:
+      - client
+      - server
+    networks:
+      - app-network
+
+  # monitoring:
+  #   build: ./monitoring
+  #   ports:
+  #     # Mappe le port 3000 du conteneur (Grafana) au port 3000 de l'hôte
+  #     - "3000:3000"
+  #   networks:
+  #     - app-network
+  #   # Ajoutez ici la configuration pour Prometheus/Grafana si vous les utilisez
+
+  # ssh_service: # Exemple si vous aviez un service SSH
+  #   image: your_ssh_image # Remplacez par l'image de votre service SSH
+  #   ports:
+  #     - "2222:22" # Mappe le port 22 interne au port 2222 de l'hôte
+  #   networks:
+  #     - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

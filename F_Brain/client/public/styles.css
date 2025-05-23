@@ -1,122 +1,283 @@
+/* Styles généraux pour le corps de la page */
 body {
     font-family: sans-serif;
     margin: 0;
     padding: 20px;
     background-color: #f4f4f4;
+    line-height: 1.6;
+    color: #333;
 }
 
+/* Style du titre principal du site */
 h1 {
     text-align: center;
     color: #333;
     margin-bottom: 30px;
+    font-size: 2.5em;
 }
 
+/* Conteneur de la grille d'articles */
 .article-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Crée une grille responsive */
-    gap: 20px; /* Espacement entre les articles */
+    /* Crée une grille responsive : autant de colonnes que possible,
+       chaque colonne ayant une largeur minimale de 280px et maximale de 1fr (fraction de l'espace disponible) */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px; /* Espacement entre les éléments de la grille */
+    padding: 0;
+    list-style: none; /* Supprime les puces de liste si le conteneur est un ul */
 }
 
+/* Style de chaque élément d'article dans la grille */
 .article-item {
     background-color: #fff;
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1); /* Ombre pour un effet de profondeur */
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Les éléments enfants sont empilés verticalement */
+    transition: transform 0.3s ease-in-out; /* Animation au survol */
 }
 
+.article-item:hover {
+    transform: translateY(-5px); /* Soulève légèrement l'élément au survol */
+}
+
+/* Style du titre de l'article */
 .article-item h2 {
     text-align: center;
     margin-top: 0;
     margin-bottom: 10px;
     color: #007bff; /* Couleur bleue pour le titre de l'article */
+    font-size: 1.5em;
 }
 
+/* Conteneur principal pour les images (principale et miniatures) */
 .article-images {
-    display: flex;
-    align-items: flex-start; /* Alignement en haut */
-    margin-bottom: 10px;
+    display: flex; /* Utilise flexbox pour aligner les images */
+    align-items: flex-start; /* Aligne les éléments en haut */
+    margin-bottom: 15px;
+    gap: 10px; /* Espacement entre le bloc des miniatures et l'image principale */
+    /* Si l'ordre HTML est miniatures puis image principale, pas besoin de flex-direction: row-reverse */
 }
 
-.main-image {
-    width: 60%; /* L'image principale prend plus de place */
-    height: auto;
-    object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
-    margin-right: 10px;
-    border-radius: 4px;
-}
-
+/* Conteneur pour les images miniatures */
 .thumbnail-images {
     display: flex;
-    flex-direction: column;
-    gap: 5px; /* Espacement entre les miniatures */
+    flex-direction: column; /* Empile les miniatures verticalement */
+    gap: 8px; /* Espacement entre les miniatures */
+    width: 20%;
+    /* Ajoutez des styles pour le défilement si nécessaire */
+    /* overflow-y: auto; */
+    /* max-height: 500px; */
+    /* padding-right: 5px; */
+    width: 100%
 }
 
+/* Style de la div conteneur de la miniature */
 .thumbnail {
-    width: 80px; /* Taille des miniatures */
-    height: 80px;
-    object-fit: cover;
-    border: 1px solid #ccc;
-    cursor: pointer; /* Indique que les miniatures sont cliquables */
+    width: 70px; /* Largeur fixe pour les miniatures */
+    height: 70px; /* Hauteur fixe pour les miniatures */
+    border: 1px solid #ddd; /* Bordure plus claire par défaut */
     border-radius: 4px;
-    transition: transform 0.2s ease-in-out; /* Animation au survol */
+    padding: 5px; /* Espacement intérieur */
+    cursor: pointer; /* Indique que les miniatures sont cliquables */
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Animation sur la bordure et l'ombre au survol */
 }
 
+/* Style de l'image à l'intérieur de la div miniature */
+.thumbnail img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Style au survol de la div miniature */
 .thumbnail:hover {
-    transform: scale(1.05); /* Agrandit légèrement au survol */
+    border-color: #e77600; /* Couleur orange comme dans votre exemple */
 }
 
+/* Style pour la miniature active */
+.thumbnail.active {
+    border-color: #e77600; /* Couleur orange comme dans votre exemple */
+    box-shadow: 0 0 3px rgba(231, 118, 0, 0.5);
+}
+
+
+/* Conteneur de l'image principale et de l'effet de zoom */
+.main-image-container {
+    width: 80%; /* L'image principale prend 80% de l'espace disponible dans .article-images */
+    position: relative; /* Important pour positionner l'élément de zoom absolument par rapport à lui */
+    display: flex; /* Utilise flexbox pour centrer l'image si elle est plus petite que le conteneur */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Cache les parties de l'image principale qui dépassent si object-fit est contain */
+    
+}
+
+/* Style de l'image principale */
+.main-image {
+    max-width: 65%; /* Assure que l'image ne dépasse pas son conteneur */
+    max-height: 300px; /* Hauteur maximale pour l'image principale (ajustez si nécessaire) */
+    object-fit: contain; /* Redimensionne l'image pour qu'elle tienne dans le conteneur sans être coupée */
+    cursor: zoom-in; /* Indique que l'image est zoomable */
+    width: auto; /* Laisse la largeur s'adapter au contenu */
+    height: auto; /* Laisse la hauteur s'adapter au contenu */
+    display: block; /* Peut aider avec le redimensionnement dans certains contextes */
+}
+
+/* Élément pour l'effet de zoom */
+.image-zoom {
+    position: absolute; /* Positionné absolument par rapport à .main-image-container */
+    width: 300px; /* Taille de la fenêtre de zoom (ajustez si nécessaire) */
+    height: 300px; /* Taille de la fenêtre de zoom (ajustez si nécessaire) */
+    border: 1px solid #ddd;
+    background-repeat: no-repeat;
+    pointer-events: none; /* Important pour ne pas intercepter les événements de souris sur l'image principale */
+    z-index: 100; /* Assure que l'élément de zoom est au-dessus des autres éléments */
+    /* Le positionnement exact (left, top) sera géré par le JavaScript */
+    transform: translate(-50%, -50%); /* Centre l'élément de zoom sur le curseur de la souris */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Ombre pour la fenêtre de zoom */
+    display: none; /* Caché par défaut, affiché par le JavaScript */
+    background-size: 200% 200%; /* Facteur de zoom (ajustez si nécessaire) */
+}
+
+
+/* Style de la description du produit */
 .article-description {
-    font-size: 0.9em;
+    font-size: 0.95em;
     color: #555;
-    margin-bottom: 10px;
-    flex-grow: 1; /* Permet à la description de prendre l'espace restant */
+    margin-bottom: 15px;
+    flex-grow: 1; /* Permet à la description de prendre l'espace vertical restant */
 }
 
+/* Conteneur pour le stock et le prix */
 .article-details {
     display: flex;
     justify-content: space-between; /* Aligne le stock à gauche et le prix à droite */
-    align-items: center;
-    margin-top: auto; /* Pousse les détails en bas de l'élément */
+    align-items: center; /* Centre verticalement le stock et le prix */
+    margin-top: auto; /* Pousse ce conteneur en bas de l'élément article-item */
+    padding-top: 10px;
+    border-top: 1px solid #eee; /* Ligne de séparation au-dessus des détails */
 }
 
+/* Style de l'information sur le stock */
 .stock-info {
-    font-size: 0.8em;
-    color: #008000; /* Couleur verte pour le stock */
+    font-size: 0.9em;
+    color: #28a745; /* Couleur verte */
     margin: 0;
-}
-
-.price {
-    font-size: 1.1em;
     font-weight: bold;
-    color: #e74c3c; /* Couleur rouge pour le prix */
+}
+
+/* Style du prix */
+.price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545; /* Couleur rouge */
     margin: 0;
 }
 
-/* Styles pour les boutons (vous pouvez les adapter) */
+/* Styles de base pour les boutons */
 button {
-    background-color: #28a745; /* Vert pour commander */
+    background-color: #007bff; /* Bleu par défaut */
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 10px;
+    font-size: 1em;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
 
-/* Style spécifique pour le bouton éditer si vous le souhaitez */
+/* Style spécifique pour le bouton "Éditer" (souvent dans un lien) */
 .article-item a button {
-    background-color: #ffc107; /* Jaune pour éditer */
+    background-color: #ffc107; /* Jaune */
     color: #333;
 }
 
 .article-item a button:hover {
     background-color: #e0a800;
+}
+
+/* Style spécifique pour le bouton "Commander" */
+/* Utilise :not(a button) pour cibler les boutons qui ne sont pas dans un lien */
+.article-item button:not(a button) {
+    background-color: #28a745;
+    color: white;
+}
+
+.article-item button:not(a button):hover {
+    background-color: #218838;
+}
+
+/* Styles pour les formulaires (ajout/édition) */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1);
+    max-width: 500px; /* Largeur maximale pour les formulaires */
+    margin: 20px auto; /* Centre le formulaire horizontalement */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacement entre les champs du formulaire */
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+form input[type="text"],
+form input[type="number"],
+form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+form button[type="submit"] {
+    align-self: flex-start; /* Aligne le bouton de soumission à gauche */
+}
+
+/* Styles pour la navigation */
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Centre les éléments de navigation */
+    background-color: #333;
+    margin: 0;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 0;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #007bff; /* Change la couleur au survol */
 }

@@ -4,37 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luc-Store - Votre Boutique en Ligne</title>
-    <link rel="stylesheet" href="%PUBLIC_URL%/styles.css"> <!-- Lien vers votre fichier CSS -->
+    <!-- Lien vers votre fichier CSS -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/styles.css">
+    <!-- Vous pouvez ajouter d'autres liens vers des polices ou des icônes ici -->
 </head>
 <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <!-- Cette div est le point d'entrée de l'application React -->
+    <!-- Le composant App de React sera rendu ici -->
     <div id="root">
-        <!-- L'application React sera rendue ici -->
+        <!-- Le contenu de l'application React (navigation, liste d'articles, formulaires) sera injecté ici -->
     </div>
 
-    <h1>Luc-Store</h1> <!-- Titre principal -->
+    <!-- Le titre principal du site peut être ici ou dans le composant App.js -->
+    <!-- Pour l'exemple, nous le laissons ici -->
+    <h1>Luc-Store</h1>
 
+    <!-- Cette div sera le conteneur de la grille d'articles -->
+    <!-- Le contenu à l'intérieur sera généré dynamiquement par votre composant React ArticleList -->
+    <!-- Note : L'exemple statique ci-dessous est pour référence structurelle et CSS seulement.
+               Le composant ArticleList est responsable de générer TOUS les articles dynamiquement. -->
     <div class="article-grid">
-        <!-- Les articles seront générés ici par votre composant React ArticleList -->
-        <!-- Voici un exemple de structure pour un article -->
+
+        <!-- Exemple de structure pour un seul article dans la grille -->
         <div class="article-item">
             <h2>Nom de l'Article</h2>
             <div class="article-images">
-                <img src="%PUBLIC_URL%/images/produit1_main.jpg" alt="Image principale du produit" class="main-image">
                 <div class="thumbnail-images">
-                    <img src="%PUBLIC_URL%/images/produit1_thumb1.jpg" alt="Miniature 1" class="thumbnail">
-                    <img src="%PUBLIC_URL%/images/produit1_thumb2.jpg" alt="Miniature 2" class="thumbnail">
+                    <!-- Miniatures cliquables (pour changer l'image principale) -->
+                    <img src="%PUBLIC_URL%/images/img1.png" alt="Miniature 1" class="thumbnail">
+                    <img src="%PUBLIC_URL%/images/img2.png" alt="Miniature 2" class="thumbnail">
+                    <img src="%PUBLIC_URL%/images/img3.jpg" alt="Miniature 3" class="thumbnail">
                 </div>
+                 <!-- Image principale du produit -->
+                <img src="%PUBLIC_URL%/images/img1.png" alt="Image principale du produit" class="main-image">
             </div>
             <p class="article-description">Description courte du produit...</p>
             <div class="article-details">
                 <p class="stock-info">Stock disponible : 10</p>
                 <p class="price">Prix HT : 25.00 €</p>
             </div>
-            <!-- Boutons "Éditer" ou "Commander" seront ajoutés par React -->
+            <!-- Les boutons "Éditer" ou "Commander" seront ajoutés ici par le composant React -->
         </div>
-        <!-- Répétez la structure .article-item pour chaque article -->
+
     </div>
 
     <!-- Le script de votre application React sera chargé automatiquement par create-react-app -->
+    <!-- Vous ne devez PAS ajouter de balises <script> ici pour votre code React -->
 </body>
 </html>

@@ -5,7 +5,6 @@ FROM node:lts-alpine as builder
 WORKDIR /app
 
 # Copie les fichiers package.json et package-lock.json (ou yarn.lock)
-# pour installer les dépendances. Cette étape est mise en cache si les fichiers ne changent pas.
 COPY package*.json ./
 
 # Installe les dépendances du projet
@@ -15,7 +14,6 @@ RUN npm install
 COPY . .
 
 # Construit l'application pour la production.
-# Le résultat (fichiers statiques) sera placé dans le dossier 'build' par défaut.
 RUN npm run build
 
 # Étape 2: Servir l'application statique avec Nginx
