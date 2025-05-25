@@ -1,30 +1,34 @@
-# Étape 1: Build de l'application React
-FROM node:lts-alpine as builder
+# Étape 1 : build de l'app React (prod)
+FROM node:18-alpine as build
 
-# Définit le répertoire de travail dans le conteneur
 WORKDIR /app
 
-# Copie les fichiers package.json et package-lock.json (ou yarn.lock)
 COPY package*.json ./
-
-# Installe les dépendances du projet
 RUN npm install
 
-# Copie le reste du code source de l'application (y compris src/, public/, etc.)
 COPY . .
-
-# Construit l'application pour la production.
 RUN npm run build
 
-# Étape 2: Servir l'application statique avec Nginx
-FROM nginx:alpine
+# Étape 2 : serveur Nginx pour servir la build (prod)
+FROM nginx:stable-alpine as production
 
-# Copie les fichiers construits depuis l'étape de build (nommée 'builder')
-# vers le répertoire de service par défaut de Nginx
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose le port 80 pour l'accès à l'application
-EXPOSE 80
+# Expose le port 4173 pour prod
+EXPOSE 4173
 
-# Commande par défaut pour démarrer Nginx en mode foreground
 CMD ["nginx", "-g", "daemon off;"]
+
+# Étape 3 : image pour dev avec Vite en mode dev (port 5173)
+FROM node:18-alpine as development
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]

@@ -1,25 +1,20 @@
-# Utilise une image Python comme base
-# Optionnel: Vous pouvez aussi utiliser python:3.12-alpine
-FROM python:3.11-alpine
+# Utiliser une image Python
+FROM python:3.9
 
-# Définit les variables d'environnement pour Python (utile pour les logs)
-ENV PYTHONUNBUFFERED 1
-
-# Définit le répertoire de travail dans le conteneur
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copie les fichiers de dépendances
-COPY requirements.txt /app/
+# Copier les fichiers de configuration
+COPY requirements.txt .
 
-# Installe les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+# Installer les dépendances
+RUN pip install -r requirements.txt
 
-# Copie le reste du code source de l'application Django
-COPY . /app/
+# Copier le reste du code
+COPY . .
 
-# Expose le port sur lequel l'application Django s'exécutera (par défaut 8000)
+# Exposer le port de Django
 EXPOSE 8000
 
-# Commande par défaut pour démarrer le serveur de développement Django
-# Pour la production, vous utiliseriez un serveur WSGI comme Gunicorn
+# Lancer le serveur Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

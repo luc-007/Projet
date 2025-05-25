@@ -1,82 +1,82 @@
 version: '3.8'
 
 services:
+  # Frontend - React
   client:
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile  # Spécifie le Dockerfile à utiliser
     ports:
-      # Mappe le port 80 du conteneur (Nginx) au port 5173 de l'hôte
-      - "5173:80"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
+      - "4173:4173"  # Port pour la version prod (Nginx)
+      - "5173:5173"  # Port pour le mode dev (Vite)
     depends_on:
       - server
-      - proxy
-    networks:
-      - app-network
-
-  server:
-    build: ./server
-    ports:
-      # Mappe le port 8000 du conteneur (Django) au port 8000 de l'hôte
-      - "8000:8000"
-    volumes:
-      - ./server:/app
     environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - SECRET_KEY=votre_cle_secrete_django
-      - DEBUG=True
-      - DJANGO_ALLOWED_HOSTS=*
+      - NODE_ENV=production
+
+  # Backend - Django
+  server:
+    build:
+      context: ./server
+    ports:
+      - "8000:8000"  # Expose l'API Django
+    volumes:
+      - ./server:/app  # Monte le code pour le développement local
     depends_on:
       - db
-    networks:
-      - app-network
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
-
-  db:
-    image: postgres:13-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-    networks:
-      - app-network
-    # Pas besoin d'exposer le port de la base de données vers l'hôte pour le fonctionnement normal
+      - DJANGO_ENV=production
 
-  proxy:
-    build: ./proxy
+  # Base de données - PostgreSQL
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ecommerce
     ports:
-      # Mappe le port 80 du conteneur (Nginx) au port 4176 de l'hôte
-      - "4176:80"
+      - "5432:5432"  # Expose le port PostgreSQL
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Proxy - Nginx
+  proxy:
+    build:
+      context: ./proxy
+    ports:
+      - "80:80"  # Serve Nginx sur le port 80
     depends_on:
       - client
       - server
-    networks:
-      - app-network
 
-  # monitoring:
-  #   build: ./monitoring
-  #   ports:
-  #     # Mappe le port 3000 du conteneur (Grafana) au port 3000 de l'hôte
-  #     - "3000:3000"
-  #   networks:
-  #     - app-network
-  #   # Ajoutez ici la configuration pour Prometheus/Grafana si vous les utilisez
+  # Monitoring - Prometheus
+  monitoring:
+    image: prom/prometheus:v2.33.0
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml  # Fichier de config Prometheus
+    ports:
+      - "9090:9090"  # Accès à Prometheus sur localhost:9090
+    depends_on:
+      - db
+      - client
+      - server
 
-  # ssh_service: # Exemple si vous aviez un service SSH
-  #   image: your_ssh_image # Remplacez par l'image de votre service SSH
-  #   ports:
-  #     - "2222:22" # Mappe le port 22 interne au port 2222 de l'hôte
-  #   networks:
-  #     - app-network
+  # Grafana - Outil de visualisation
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "admin"  # Mot de passe pour l'admin
+    ports:
+      - "3001:3000"  # Accès à Grafana sur localhost:3001
+    depends_on:
+      - monitoring
+    links:
+      - monitoring
+    volumes:
+      - grafana_data:/var/lib/grafana  # Volume pour les données de Grafana
 
 volumes:
-  postgres_data:
-
-networks:
-  app-network:
-    driver: bridge
+  postgres_data:  # Volume pour la base de données PostgreSQL
+  grafana_data:   # Volume pour Grafana

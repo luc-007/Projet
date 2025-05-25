@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s  # La fréquence à laquelle Prometheus va scraper les métriques
+
+scrape_configs:
+  # Scraper les métriques du backend Django (avec un endpoint exposé par Django, comme /metrics)
+  - job_name: 'django'
+    static_configs:
+      - targets: ['server:8000']  # Le service Django exposant les métriques
+
+  # Scraper les métriques du frontend React (si tu utilises par exemple un outil comme `react-metrics` pour cela)
+  - job_name: 'react'
+    static_configs:
+      - targets: ['client:3000']  # Le service React
+
+  # Scraper les métriques de la base de données PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['db:5432']  # Le service PostgreSQL
