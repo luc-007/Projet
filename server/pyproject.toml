@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "server"
+version = "0.1.0"
+description = ""
+authors = ["luc-007 kemtaluc23@gmail.com"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+django = "^4.2"
+celery = "^5.5.3"
+django-prometheus = "^2.3.1"
+django-celery-results = "^2.6.0"
+django-celery-beat = "^2.8.1"
+psycopg2-binary = "^2.9.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
