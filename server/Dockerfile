@@ -14,6 +14,15 @@ RUN pip install -r requirements.txt
 # Copier le code source
 COPY . .
 
+# Collect static files
+RUN python manage.py collectstatic --noinput --clear 
+
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh .
+RUN chmod +x /app/entrypoint.sh
+
+
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "server_config.wsgi:application"]
+ENTRYPOINT ["/app/entrypoint.sh"] # Set the entrypoint
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "server_config.wsgi:application"] # Remains as the command passed to entrypoint

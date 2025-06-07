@@ -3,6 +3,8 @@ services:
     build: ./proxy
     ports:
       - "80:80"
+    volumes:
+      - static_content:/var/www/html  # Pour servir les fichiers statiques
     depends_on:
       - client
       - server
@@ -26,6 +28,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - static_content:/app/staticfiles  # Montage du même volume
 
   db:
     image: postgres:latest
@@ -77,3 +81,4 @@ volumes:
   pgdata:
   prometheus_data:
   grafana_data:
+  static_content: {}
