@@ -24,5 +24,6 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"] # Set the entrypoint
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "server_config.wsgi:application"] # Remains as the command passed to entrypoint
+ENTRYPOINT /app/entrypoint.sh
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "server_config.wsgi:application"]
+# Remains as the command passed to entrypoint

@@ -6,16 +6,30 @@ services:
     volumes:
       - static_content:/var/www/html  # Pour servir les fichiers statiques
     depends_on:
-      - client
-      - server
+      client:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    networks: # Nginx also needs to be on the backend network to reach server and client by service name
+      - backend
 
   client:
     build: ./client
-    expose:
-      - "5173"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks: # Client also needs to be on the backend network if nginx proxies to it by service name 'client'
+      - backend
 
   server:
     build: ./server
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/api/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5 # Server might take longer to start
     expose:
       - "8000"
     environment:
@@ -30,6 +44,9 @@ services:
         condition: service_healthy
     volumes:
       - static_content:/app/staticfiles  # Montage du même volume
+    command: gunicorn --bind 0.0.0.0:8000 server_config.wsgi:application
+    networks: # Added server to the backend network
+      - backend
 
   db:
     image: postgres:latest
