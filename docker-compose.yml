@@ -1,10 +1,12 @@
 services:
   nginx:
     build: ./proxy
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
       - static_content:/var/www/html  # Pour servir les fichiers statiques
+      - media_content:/var/www/media # For serving media files
     depends_on:
       client:
         condition: service_healthy
@@ -15,6 +17,7 @@ services:
 
   client:
     build: ./client
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
       interval: 10s
@@ -25,6 +28,7 @@ services:
 
   server:
     build: ./server
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/api/ || exit 1"]
       interval: 10s
@@ -37,6 +41,8 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_HOST=db
+      - DJANGO_SECRET_KEY
+      - DJANGO_DEBUG
     env_file:
       - .env
     depends_on:
@@ -44,12 +50,14 @@ services:
         condition: service_healthy
     volumes:
       - static_content:/app/staticfiles  # Montage du même volume
+      - media_content:/app/mediafiles   # Mount for media files
     command: gunicorn --bind 0.0.0.0:8000 server_config.wsgi:application
     networks: # Added server to the backend network
       - backend
 
   db:
     image: postgres:latest
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -68,6 +76,7 @@ services:
 
   prometheus:
     image: prom/prometheus
+    restart: unless-stopped
     volumes:
       - ./monitoring/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
@@ -80,6 +89,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    restart: unless-stopped
     volumes:
       - ./monitoring/grafana:/etc/grafana
       - grafana_data:/var/lib/grafana
@@ -99,3 +109,4 @@ volumes:
   prometheus_data:
   grafana_data:
   static_content: {}
+  media_content: {}
